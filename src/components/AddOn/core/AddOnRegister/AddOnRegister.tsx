@@ -5,6 +5,7 @@ import { Button, Form, Modal } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import { ADD_PLUGIN_MUTATION } from 'GraphQl/Mutations/mutations';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 interface AddOnRegisterProps {
   id?: string; // OrgId
@@ -19,7 +20,6 @@ interface formStateTypes {
 }
 const currentUrl = window.location.href.split('=')[1];
 
-console.log(currentUrl);
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function AddOnRegister({ createdBy }: AddOnRegisterProps): JSX.Element {
   const { t } = useTranslation('translation', { keyPrefix: 'addOnRegister' });
@@ -39,22 +39,24 @@ function AddOnRegister({ createdBy }: AddOnRegisterProps): JSX.Element {
   });
 
   const handleRegister = async () => {
-    console.log(formState);
-    const { data } = await create({
-      variables: {
-        $pluginName: formState.pluginName,
-        $pluginCreatedBy: formState.pluginCreatedBy,
-        $pluginDesc: formState.pluginDesc,
-        $pluginInstallStatus: formState.pluginInstallStatus,
-        $installedOrgs: formState.installedOrgs,
-      },
-    });
+    try {
+      const { data } = await create({
+        variables: {
+          pluginName: formState.pluginName,
+          pluginCreatedBy: formState.pluginCreatedBy,
+          pluginDesc: formState.pluginDesc,
+          pluginInstallStatus: formState.pluginInstallStatus,
+          installedOrgs: formState.installedOrgs,
+        },
+      });
 
-    if (data) {
-      window.alert('Plugin Added Successfully');
-      window.location.reload();
+      if (data) {
+        window.alert('Plugin Added Successfully');
+        window.location.reload();
+      }
+    } catch (error: any) {
+      toast.error(error.message);
     }
-    console.log('Data is ', data);
   };
   return (
     <>
